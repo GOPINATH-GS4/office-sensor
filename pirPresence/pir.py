@@ -6,6 +6,9 @@ import time
 import random
 import urllib2
 import fcntl, socket, struct, sys
+from subprocess import call
+import time
+
 
 # Get MAC address in a format that can be embedded in a URL
 def getHwAddr(ifname):
@@ -19,6 +22,7 @@ PIR_PIN = 4
 myName = getHwAddr('eth0')
 GPIO.setup(PIR_PIN, GPIO.IN)
 
+startTime = time.time();
 
 if len(sys.argv) > 1 and sys.argv[1] == "test" :
 	testMode = True
@@ -28,6 +32,9 @@ else :
     
 def MOTION(PIR_PIN):
     print 'Motion Detected! Calling http://iot.merck.com/IOT-api/%s%d/moveDetected:' % (myName, PIR_PIN)
+    call(["node", "../hueLights/setColor.js", "5", "red"])
+    global startTime
+    startTime = time.time();
     if not testMode : 
 	response = urllib2.urlopen('http://iot.merck.com/IOT-api/%s%d/moveDetected:' % (myName, PIR_PIN))
 	data = response.read()
@@ -46,9 +53,14 @@ try:
 	print data
 
     while 1:
-        time.sleep(60*15)   # send heartbeat every 15 minutes
+        time.sleep(60)   # send heartbeat every 15 minutes
+	currentTime = time.time();
+	print (currentTime - startTime);
         print 'Sending http://iot.merck.com/IOT-api/%s%d/pulse:' % (myName, PIR_PIN)
+	if abs(currentTime - startTime) > 30 : 
+		call(["node", "../hueLights/setColor.js", "5", "green"])
 	if not testMode : 
+		start_time = time.time()
 		response = urllib2.urlopen('http://iot.merck.com/IOT-api/%s%d/pulse:' % (myName, PIR_PIN))
 		data = response.read()
 		print data

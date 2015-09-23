@@ -1,0 +1,11 @@
+{
+  "name": "office_sensor",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "request":"*",
+    "pi-gpio":"*",
+    "onoff": "*"
+  }
+}
+
