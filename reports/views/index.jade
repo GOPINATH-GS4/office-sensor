@@ -1,0 +1,40 @@
+doctype html
+html(lang='en')
+  head
+    title Office Sensor
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    link(rel='stylesheet', href='http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
+    link(href='/assets/css/style.css', rel='stylesheet')
+
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
+    script(src='http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js')
+    script(src='http://code.highcharts.com/highcharts.js')
+    script(src='http://code.highcharts.com/modules/exporting.js')
+
+    script(src='/lib/OfficeSensor.js')
+    script(src='/lib/HTTPRequest.js')
+
+  body
+    .container
+      h2 Office Sensor Reports
+      form
+      .row
+        | Time increment 
+        input#incr(class='margin-left-s', type='number', name = 'incr', min= "5" max="20")
+        | Limit 	
+        input#limit(class='margin-left-s', type='number', name = 'incr', min="5" max="20")
+      .row
+        |   
+      .row
+        | Resource
+        select#selection(style='margin-left:20px;line-height:34px;margin-right:20px;font-size:30px', name='resource')
+            option(value='Room-1263') Room-1263
+            option(value='Conf-1236') Conf-1236
+        | Start Date
+        input#start_date(class='margin-left', type='date', name='start_date')
+        | End Date
+        input#end_date(class='margin-left', type='date', name='end_date')
+        | 
+        button(type='button' onclick="processData()") Report
+        #chart

@@ -1,5 +1,5 @@
 var mongoose = require('mongoose'),
-    db = mongoose.createConnection('localhost:27017/office_sensor'),
+    db = mongoose.createConnection(process.env.office_sensor_db || 'localhost:27017/office_sensor'),
     Schema = mongoose.Schema,
     ObjectId = Schema.ObjectId;
 
