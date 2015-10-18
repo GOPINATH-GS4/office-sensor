@@ -21,20 +21,27 @@ html(lang='en')
       form
       .row
         | Time increment 
-        input#incr(class='margin-left-s', type='number', name = 'incr', min= "5" max="20")
-        | Limit 	
-        input#limit(class='margin-left-s', type='number', name = 'incr', min="5" max="20")
+        input#incr(class='margin-left-s', type='number', name = 'incr', min= "10" max="60")
+        | Number of movements 	
+        input#limit(class='margin-left-s', type='number', name = 'incr', min="10" max="60")
+      .row 
+        |    
+      .row 
+        |    
       .row
-        |   
+        | Crowd Analysis
+        select#crowd_analysis(style='margin-left:20px;line-height:34px;margin-right:20px;font-size:30px', name='resource')
+            option(value='false') false
+            option(value='true') true
+        | 
       .row
         | Resource
-        select#selection(style='margin-left:20px;line-height:34px;margin-right:20px;font-size:30px', name='resource')
+        select#resource(style='margin-left:20px;line-height:34px;margin-right:20px;font-size:30px', name='resource')
             option(value='Room-1263') Room-1263
             option(value='Conf-1236') Conf-1236
         | Start Date
         input#start_date(class='margin-left', type='date', name='start_date')
         | End Date
         input#end_date(class='margin-left', type='date', name='end_date')
-        | 
         button(type='button' onclick="processData()") Report
         #chart

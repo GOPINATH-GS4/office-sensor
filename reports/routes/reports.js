@@ -22,7 +22,7 @@ module.exports = function(app, _, utils) {
         var room = req.query.room;
         var incr = req.query.incr || 5;
         var cnt = req.query.cnt || 10;
-
+        var crowd_analysis = req.query.crowd_analysis;
         var count = 0;
         var index = 0;
         var arr = [];
@@ -37,7 +37,7 @@ module.exports = function(app, _, utils) {
             };
             (function(range) {
                 arr.push(function(callback) {
-                    getData(callback, range, room, incr, cnt);
+                    getData(callback, range, room, incr, cnt, crowd_analysis);
                 });
             })(range);
             start_date = dt;
@@ -45,18 +45,30 @@ module.exports = function(app, _, utils) {
 
         async.series(arr, function(err) {
             console.log('All complete');
-	    //console.log('Results.length ' + results.length);
-            console.log(JSON.stringify(results, null, 10));
+
+
+            if (crowd_analysis === 'true') {
+                var max = _.max(results, function(result) {
+                    return result.crd;
+                });
+
+                _.each(results, function(result) {
+                    if (result.cnt != 0) result.cnt = (30 * incr  > max.crd) ? 30 * incr : max.crd;
+                });
+            }
+
+            //console.log(JSON.stringify(results, null, 10));
+            console.log(max);
             utils.writeResponse(req, res, results);
         });
     }
     var callback = function() {};
 
-    var getData = function(callback, range, resource, incr, cnt) {
+    var getData = function(callback, range, resource, incr, cnt, crowd_analysis) {
 
         //console.log('Executing Range' + JSON.stringify(range));
         db.Measurements.find({
-            resource: resource, 
+            resource: resource,
             $and: [{
                 dt: {
                     $gte: range.start_date
@@ -70,10 +82,17 @@ module.exports = function(app, _, utils) {
             if (err)
                 console.log(err);
             else {
-                if (docs.length >= cnt)
-                    range.cnt = 10
-                else
+                if (docs.length >= cnt) {
+                    range.cnt = cnt;
+
+                    if (crowd_analysis === 'true')
+                        range.crd = docs.length;
+                    else
+                        range.crd = 0;
+                } else {
                     range.cnt = 0;
+                    range.crd = 0;
+                }
             }
             results.push(range);
             callback();
