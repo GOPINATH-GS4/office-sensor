@@ -45,18 +45,35 @@ module.exports = function(app, _, utils) {
 
         async.series(arr, function(err) {
             console.log('All complete');
-
+            var max;
 
             if (crowd_analysis === 'true') {
-                var max = _.max(results, function(result) {
+                max = _.max(results, function(result) {
                     return result.crd;
                 });
 
                 _.each(results, function(result) {
-                    if (result.cnt != 0) result.cnt = (30 * incr  > max.crd) ? 30 * incr : max.crd;
+                    if (result.cnt != 0) result.cnt = (30 * incr > max.crd) ? 30 * incr : max.crd;
                 });
             }
 
+            //var csvFileName = '/tmp/' + room + '-' + start_date + '_' + end_date + '.csv';
+            var csvFileName = '/tmp/report1.csv';
+
+            fs.writeFileSync(csvFileName, 'Room,' + room + '\n');
+            fs.appendFileSync(csvFileName, 'Time, Sensor-Status, Outlook-status\n');
+            var prev_date;
+            _.each(results, function(result, index) {
+                var dts = result.start_date.toString().split(' ');
+                var curr_date = dts[0] + ' ' + dts[1] + ' ' + dts[2] + ' ' + dts[3];
+                if (index === 0 || prev_date !== curr_date) {
+                    prev_date = curr_date;
+                    fs.appendFileSync(csvFileName, 'Date,' + prev_date + '\n');
+                }
+                prev_date = curr_date;
+
+                fs.appendFileSync(csvFileName, dts[4] + ',' + ((result.cnt > 0) ? 'Occupied' : 'Free') + ',,' + '\n');
+            });
             //console.log(JSON.stringify(results, null, 10));
             console.log(max);
             utils.writeResponse(req, res, results);
